@@ -15,5 +15,6 @@ class Autoloader {
         // load class.
         I18n::get_instance();
         Enqueue_Assets::get_instance();
+        Modify_Checkout_Form::get_instance();
     }
 }
