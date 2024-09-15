@@ -17,5 +17,6 @@ class Autoloader {
         Enqueue_Assets::get_instance();
         Modify_Checkout_Form::get_instance();
         Create_Order::get_instance();
+        Admin_Menu::get_instance();
     }
 }

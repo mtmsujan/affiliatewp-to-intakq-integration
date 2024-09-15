@@ -63,7 +63,7 @@ class Create_Order {
             CURLOPT_CUSTOMREQUEST  => 'POST',
             CURLOPT_POSTFIELDS     => json_encode( $data ), // Dynamically pass $data array as JSON payload
             CURLOPT_HTTPHEADER     => array(
-                'X-Auth-Key: ',
+                'X-Auth-Key: 143c0532157dfe506829ebded299f00bee2e6ee9',
                 'Content-Type: application/json',
             ),
         ) );
