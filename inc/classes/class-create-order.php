@@ -50,6 +50,9 @@ class Create_Order {
 
     public function call_api( $data ) {
 
+        // get API key from database
+        $api_key = get_option( 'awpiq_api_key' );
+
         $curl = curl_init();
 
         curl_setopt_array( $curl, array(
@@ -63,7 +66,7 @@ class Create_Order {
             CURLOPT_CUSTOMREQUEST  => 'POST',
             CURLOPT_POSTFIELDS     => json_encode( $data ), // Dynamically pass $data array as JSON payload
             CURLOPT_HTTPHEADER     => array(
-                'X-Auth-Key: 143c0532157dfe506829ebded299f00bee2e6ee9',
+                'X-Auth-Key: ' . $api_key,
                 'Content-Type: application/json',
             ),
         ) );
