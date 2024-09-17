@@ -15,7 +15,17 @@ class Modify_Checkout_Form {
     }
 
     public function setup_hooks() {
-        add_filter( 'woocommerce_checkout_fields', [ $this, 'custom_override_checkout_fields' ] );
+
+        // add_filter( 'woocommerce_checkout_fields', [ $this, 'custom_override_checkout_fields' ] );
+
+        // Change add to cart button text on single product page
+        add_filter( 'woocommerce_product_single_add_to_cart_text', [ $this, 'custom_single_add_to_cart_text' ] );
+
+        // Change add to cart button text on shop and archive pages
+        add_filter( 'woocommerce_product_add_to_cart_text', [ $this, 'custom_archive_add_to_cart_text' ] );
+
+        // Redirect to checkout page after adding a product to the cart
+        add_filter( 'woocommerce_add_to_cart_redirect', [ $this, 'custom_redirect_to_checkout' ] );
     }
 
     public function custom_override_checkout_fields( $fields ) {
@@ -32,5 +42,17 @@ class Modify_Checkout_Form {
         unset( $fields['billing']['billing_country'] );
 
         return $fields;
+    }
+
+    public function custom_single_add_to_cart_text() {
+        return __( 'Sign Up', 'intakq' );
+    }
+
+    public function custom_archive_add_to_cart_text() {
+        return __( 'Sign Up', 'intakq' );
+    }
+
+    function custom_redirect_to_checkout() {
+        return wc_get_checkout_url();
     }
 }
