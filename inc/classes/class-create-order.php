@@ -25,6 +25,7 @@ class Create_Order {
 
         if ( !$order ) {
             $this->put_program_logs( 'Order not found.' );
+			update_option('order_nor_found', 'Order not Found');
             return;
         }
 
@@ -45,7 +46,8 @@ class Create_Order {
         $response = $this->call_api( $data );
 
         // Log the API response
-        $this->put_program_logs( 'API Response: ' . $response );
+        // $this->put_program_logs( 'API Response: ' . $response );
+		update_option('api_response', $response);
     }
 
     public function call_api( $data ) {
@@ -75,7 +77,8 @@ class Create_Order {
 
         if ( curl_errno( $curl ) ) {
             $error_msg = curl_error( $curl );
-            $this->put_program_logs( 'cURL error: ' . $error_msg );
+            // $this->put_program_logs( 'cURL error: ' . $error_msg );
+			update_option('curl_error', $error_msg);
         }
 
         curl_close( $curl );
