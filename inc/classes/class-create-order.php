@@ -24,7 +24,7 @@ class Create_Order {
         $order = wc_get_order( $order_id );
 
         if ( !$order ) {
-            $this->put_program_logs( 'Order not found.' );
+            // $this->put_program_logs( 'Order not found.' );
 			update_option('order_nor_found', 'Order not Found');
             return;
         }
@@ -66,7 +66,7 @@ class Create_Order {
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION   => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST  => 'POST',
-            CURLOPT_POSTFIELDS     => json_encode( $data ), // Dynamically pass $data array as JSON payload
+            CURLOPT_POSTFIELDS     => json_encode( $data ),
             CURLOPT_HTTPHEADER     => array(
                 'X-Auth-Key: ' . $api_key,
                 'Content-Type: application/json',
