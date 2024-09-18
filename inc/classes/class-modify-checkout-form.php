@@ -45,6 +45,11 @@ class Modify_Checkout_Form {
         // unset( $fields['billing']['billing_state'] );
         // unset( $fields['billing']['billing_country'] );
 
+        // Change the label to 'Note'
+        if ( isset( $fields['order']['order_comments'] ) ) {
+            $fields['order']['order_comments']['label']       = 'Note'; // Update label text
+            $fields['order']['order_comments']['placeholder'] = 'Enter your note here'; // Update placeholder text
+        }
         return $fields;
     }
 
