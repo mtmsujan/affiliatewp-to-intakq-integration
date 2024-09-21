@@ -18,5 +18,6 @@ class Autoloader {
         Modify_Checkout_Form::get_instance();
         Create_Order::get_instance();
         Admin_Menu::get_instance();
+        File_Upload::get_instance();
     }
 }
