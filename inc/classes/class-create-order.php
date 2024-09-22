@@ -10,6 +10,9 @@ class Create_Order {
     use Singleton;
     use Program_Logs;
 
+    private $product_id;
+    private $package_info;
+
     public function __construct() {
         $this->setup_hooks();
     }
@@ -20,14 +23,30 @@ class Create_Order {
     }
 
     public function create_order( $order_id ) {
+        
         // Get the order object
         $order = wc_get_order( $order_id );
 
         if ( !$order ) {
             // $this->put_program_logs( 'Order not found.' );
-			update_option('order_nor_found', 'Order not Found');
+            update_option( 'order_nor_found', 'Order not Found' );
             return;
         }
+
+        // Get items
+        $items = $order->get_items();
+        if ( $items ) {
+            foreach ( $items as $item_id => $item ) {
+                // Get product ID
+                $this->product_id = $item->get_product_id();
+            }
+        }
+
+        // Get package info from postmeta table by _intakq_page_options key
+        $this->package_info = get_post_meta( $this->product_id, '_intakq_page_options', true );
+
+        // Log the package info
+        // $this->put_program_logs( 'Package Info: ' . json_encode( $this->package_info ) );
 
         // Prepare the data array dynamically from the order
         $data = [
@@ -47,7 +66,7 @@ class Create_Order {
 
         // Log the API response
         // $this->put_program_logs( 'API Response: ' . $response );
-		update_option('api_response', $response);
+        update_option( 'api_response', $response );
     }
 
     public function call_api( $data ) {
@@ -78,7 +97,7 @@ class Create_Order {
         if ( curl_errno( $curl ) ) {
             $error_msg = curl_error( $curl );
             // $this->put_program_logs( 'cURL error: ' . $error_msg );
-			update_option('curl_error', $error_msg);
+            update_option( 'curl_error', $error_msg );
         }
 
         curl_close( $curl );
