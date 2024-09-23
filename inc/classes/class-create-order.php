@@ -12,6 +12,8 @@ class Create_Order {
 
     private $product_id;
     private $package_info;
+    private $package_title;
+    private $package_id;
 
     public function __construct() {
         $this->setup_hooks();
@@ -23,13 +25,12 @@ class Create_Order {
     }
 
     public function create_order( $order_id ) {
-        
+
         // Get the order object
         $order = wc_get_order( $order_id );
 
         if ( !$order ) {
-            // $this->put_program_logs( 'Order not found.' );
-            update_option( 'order_nor_found', 'Order not Found' );
+            update_option( 'order_not_found', 'Order not Found' );
             return;
         }
 
@@ -39,17 +40,18 @@ class Create_Order {
             foreach ( $items as $item_id => $item ) {
                 // Get product ID
                 $this->product_id = $item->get_product_id();
+                // Get product title
+                $this->package_title = $item->get_name();
             }
         }
 
         // Get package info from postmeta table by _intakq_page_options key
         $this->package_info = get_post_meta( $this->product_id, '_intakq_page_options', true );
+        // Get package ID
+        $this->package_id = $this->package_info['packageId'];
 
-        // Log the package info
-        // $this->put_program_logs( 'Package Info: ' . json_encode( $this->package_info ) );
-
-        // Prepare the data array dynamically from the order
-        $data = [
+        // Prepare the basic data array dynamically from the order
+        $mandatory_data = [
             'ClientId'  => 0,
             'Name'      => $order->get_billing_first_name() . ' ' . $order->get_billing_last_name(),
             'FirstName' => $order->get_billing_first_name(),
@@ -58,16 +60,72 @@ class Create_Order {
             'Phone'     => $order->get_billing_phone(),
         ];
 
-        // Log the payload
-        // $this->put_program_logs( 'Payload: ' . json_encode( $data ) );
+        // Prepare the additional data array based on the full payload structure
+        $additional_data = [
+            'MiddleName'                          => null,
+            'DateOfBirth'                         => null,
+            'MaritalStatus'                       => null,
+            'Gender'                              => null,
+            'Archived'                            => false,
+            'HomePhone'                           => $order->get_billing_phone(),
+            'WorkPhone'                           => null,
+            'MobilePhone'                         => null,
+            'Address'                             => $order->get_billing_address_1(),
+            'UnitNumber'                          => null,
+            'StreetAddress'                       => $order->get_billing_address_1(),
+            'City'                                => $order->get_billing_city(),
+            'StateShort'                          => $order->get_billing_state(),
+            'Country'                             => $order->get_billing_country(),
+            'PostalCode'                          => $order->get_billing_postcode(),
+            'PractitionerId'                      => null,
+            'AdditionalInformation'               => null,
+            'PrimaryInsuranceCompany'             => null,
+            'PrimaryInsurancePolicyNumber'        => null,
+            'PrimaryInsuranceGroupNumber'         => null,
+            'PrimaryInsuranceHolderName'          => null,
+            'PrimaryInsuranceRelationship'        => null,
+            'PrimaryInsuranceHolderDateOfBirth'   => null,
+            'SecondaryInsuranceCompany'           => null,
+            'SecondaryInsurancePolicyNumber'      => null,
+            'SecondaryInsuranceGroupNumber'       => null,
+            'SecondaryInsuranceHolderName'        => null,
+            'SecondaryInsuranceRelationship'      => null,
+            'SecondaryInsuranceHolderDateOfBirth' => null,
+            'DateCreated'                         => time() * 1000, // Current timestamp in milliseconds
+            'LastActivityDate'                    => time() * 1000,
+            'StripeCustomerId'                    => null,
+            'SquareCustomerId'                    => null,
+            'ExternalClientId'                    => null,
+            'CustomFields'                        => [
+                [
+                    'FieldId' => 'packageName',
+                    'Text'    => 'Package Name',
+                    'Value'   => $this->package_title,
+                ],
+                [
+                    'FieldId' => 'packageId',
+                    'Text'    => 'Package ID',
+                    'Value'   => $this->package_id,
+                ],
+            ],
+        ];
+
+        // Merge the additional data into the main $data array
+        $payload = array_merge( $mandatory_data, $additional_data );
+
+        // Put payload to log
+        // $this->put_program_logs( 'Payload: ' . json_encode( $payload ) );
 
         // Create order and call API
-        $response = $this->call_api( $data );
+        $response = $this->call_api( $payload );
+
+        // Put response to log
+        // $this->put_program_logs( 'Response: ' . $response );
 
         // Log the API response
-        // $this->put_program_logs( 'API Response: ' . $response );
         update_option( 'api_response', $response );
     }
+
 
     public function call_api( $data ) {
 
