@@ -12,7 +12,7 @@
 include_once PLUGIN_BASE_PATH . '/inc/helpers/helper-functions.php';
 
 // include codestar framework
-include_once PLUGIN_LIBS_DIR_PATH . '/codestar-framework/codestar-framework.php';
+// include_once PLUGIN_LIBS_DIR_PATH . '/codestar-framework/codestar-framework.php';
 
 // include file-metabox file
-include_once PLUGIN_BASE_PATH . '/inc/files/file-metabox.php';
+// include_once PLUGIN_BASE_PATH . '/inc/files/file-metabox.php';

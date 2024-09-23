@@ -11,9 +11,9 @@ class Create_Order {
     use Program_Logs;
 
     private $product_id;
+    private $package_id;
     private $package_info;
     private $package_title;
-    private $package_id;
 
     public function __construct() {
         $this->setup_hooks();
@@ -34,6 +34,11 @@ class Create_Order {
             return;
         }
 
+        // get order total
+        $order_total = $order->get_total();
+        // get order date
+        $order_date = $order->get_date_created();
+
         // Get items
         $items = $order->get_items();
         if ( $items ) {
@@ -46,9 +51,12 @@ class Create_Order {
         }
 
         // Get package info from postmeta table by _intakq_page_options key
-        $this->package_info = get_post_meta( $this->product_id, '_intakq_page_options', true );
+        // $this->package_info = get_post_meta( $this->product_id, '_intakq_page_options', true );
         // Get package ID
-        $this->package_id = $this->package_info['packageId'];
+        // $this->package_id = $this->package_info['packageId'];
+
+        // Generate additional information
+        $additional_information = sprintf( "Package Name: %s | Price: %s", $this->package_title, $order_total );
 
         // Prepare the basic data array dynamically from the order
         $mandatory_data = [
@@ -78,7 +86,7 @@ class Create_Order {
             'Country'                             => $order->get_billing_country(),
             'PostalCode'                          => $order->get_billing_postcode(),
             'PractitionerId'                      => null,
-            'AdditionalInformation'               => null,
+            'AdditionalInformation'               => $additional_information,
             'PrimaryInsuranceCompany'             => null,
             'PrimaryInsurancePolicyNumber'        => null,
             'PrimaryInsuranceGroupNumber'         => null,
@@ -96,18 +104,7 @@ class Create_Order {
             'StripeCustomerId'                    => null,
             'SquareCustomerId'                    => null,
             'ExternalClientId'                    => null,
-            'CustomFields'                        => [
-                [
-                    'FieldId' => 'packageName',
-                    'Text'    => 'Package Name',
-                    'Value'   => $this->package_title,
-                ],
-                [
-                    'FieldId' => 'packageId',
-                    'Text'    => 'Package ID',
-                    'Value'   => $this->package_id,
-                ],
-            ],
+            'CustomFields'                        => [],
         ];
 
         // Merge the additional data into the main $data array
