@@ -20,8 +20,8 @@ class Create_Order {
     }
 
     public function setup_hooks() {
-        // add_action( 'woocommerce_payment_complete', [ $this, 'create_order' ] ); // Trigger after payment completion
-        add_action( 'woocommerce_thankyou', [ $this, 'create_order' ] );
+        add_action( 'woocommerce_payment_complete', [ $this, 'create_order' ] ); // Trigger after payment completion
+        // add_action( 'woocommerce_thankyou', [ $this, 'create_order' ] );
     }
 
     public function create_order( $order_id ) {
@@ -36,8 +36,8 @@ class Create_Order {
 
         // get order total
         $order_total = $order->get_total();
-        // get order date
-        $order_date = $order->get_date_created();
+        // get payment status
+        $payment_status = 'paid';
 
         // Get items
         $items = $order->get_items();
@@ -56,7 +56,7 @@ class Create_Order {
         // $this->package_id = $this->package_info['packageId'];
 
         // Generate additional information
-        $additional_information = sprintf( "Package Name: %s | Price: %s", $this->package_title, $order_total );
+        $additional_information = sprintf( "Package: %s | Price: %s | Status: %s", $this->package_title, $order_total, $payment_status );
 
         // Prepare the basic data array dynamically from the order
         $mandatory_data = [
